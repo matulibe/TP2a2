@@ -1,0 +1,10 @@
+Alumno Sin Nombre
+E;Pikachu;25;Pikachu es uno de los pokémon que tiene la apariencia de un pequeño ratón.
+P;pika;5;S
+P;kachu;15;N
+P;Pikacha;20;N
+P;Pikante;39;S
+E;Charmander;4;La llama que tiene en la punta de la cola arde según sus sentimientos.
+P;Char;23;N
+P;Mander;5;S
+P;Agumon;13;N
