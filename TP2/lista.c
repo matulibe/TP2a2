@@ -291,7 +291,7 @@ void* lista_primero(lista_t* lista){
   return (void*)(lista->inicio->dato);
 }
 
-void destruir_nodos(nodo_t* borrado, int cantidad){
+static void destruir_nodos(nodo_t* borrado, int cantidad){
   nodo_t* auxiliar;
   for(int i = 0; i < cantidad; i++){
     auxiliar = borrado->siguiente;

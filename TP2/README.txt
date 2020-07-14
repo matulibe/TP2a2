@@ -1,1 +1,3 @@
-    Se modifico la funcion 'abb_con_cada_elemento' ya que esta acotaba la cantidad de elementos que podia recibir el arbol.
+Se modifico la funcion 'abb_con_cada_elemento' ya que esta acotaba la cantidad de elementos que podia recibir el arbol. En vez de usar un vector en el stack se implementaron 3 funciones 
+las cuales recorren el arbol de manera recursiva y ejecutan la funcion recibida.
+A las funiciones 'destruir_nodos' del tda listas y abb se las declaro como funciones estaticas para restringir el ambito de donde se definen y asi evitar que haya problemas al compilar.

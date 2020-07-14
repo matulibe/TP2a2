@@ -324,7 +324,7 @@ int arbol_recorrido_postorden(abb_t* arbol, void** array, int tamanio_array){
  *Post: Usara el destructor del arbol para destruir el elemento y despues liberara la memoria
  *ocupada por el nodo.
  */
-void destruir_nodos(nodo_abb_t* nodo, abb_t* arbol){
+static void destruir_nodos(nodo_abb_t* nodo, abb_t* arbol){
   if(!nodo)
     return;
   destruir_nodos(nodo->izquierda, arbol);
@@ -342,40 +342,45 @@ void arbol_destruir(abb_t* arbol){
   free(arbol);
 }
 
-void cantidad_de_elementos(nodo_abb_t* nodo, int* cant){
-  if(!nodo || !cant)
+void cada_elemento_ind(nodo_abb_t* nodo, bool (*funcion)(void*, void*), void* extra, bool* corte){
+  if(!nodo || *corte == true)
     return;
-  cantidad_de_elementos(nodo->izquierda, cant);
-  cantidad_de_elementos(nodo->derecha, cant);
-  cant+=1;
-} 
+  cada_elemento_ind(nodo->izquierda, funcion, extra, corte);
+  if(*corte == true)
+    return;
+  *corte = funcion(nodo->elemento, extra);
+  cada_elemento_ind(nodo->derecha, funcion, extra, corte);
+}
 
+
+void cada_elemento_nid(nodo_abb_t* nodo, bool (*funcion)(void*, void*), void* extra, bool* corte){
+  if(!nodo || *corte == true)
+    return;
+  *corte = funcion(nodo->elemento, extra);
+  cada_elemento_nid(nodo->izquierda, funcion, extra, corte);
+  cada_elemento_nid(nodo->derecha, funcion, extra, corte);
+}
+
+
+void cada_elemento_idn(nodo_abb_t* nodo, bool (*funcion)(void*, void*), void* extra, bool* corte){
+  if(!nodo || *corte == true)
+    return;
+  cada_elemento_idn(nodo->izquierda, funcion, extra, corte);
+  cada_elemento_idn(nodo->derecha, funcion, extra, corte);
+  if(*corte == true)
+    return;
+  *corte = funcion(nodo->elemento, extra);
+}
 
 void abb_con_cada_elemento(abb_t* arbol, int recorrido, bool (*funcion)(void*, void*), void* extra){
-  int cantidad = 0;
-  int i = 0;
+  if(!arbol || !funcion)
+    return;
   bool corte = false;
-  cantidad_de_elementos(arbol->nodo_raiz, &cantidad);
-  void* array = malloc(sizeof(nodo_abb_t));
   if(recorrido == ABB_RECORRER_INORDEN){
-    arbol_recorrido_inorden(arbol, (void**)array, cantidad);
-    while(corte == false && i < cantidad){
-      corte = funcion(array[i], extra);
-      i++;
-    }
-
+    cada_elemento_ind(arbol->nodo_raiz, funcion, extra, &corte);
   }else if(recorrido == ABB_RECORRER_PREORDEN){
-    arbol_recorrido_preorden(arbol, (void**)array, cantidad);
-    while(corte == false && i < cantidad){
-      corte = funcion(array[i], extra);
-      i++;
-    }
+    cada_elemento_nid(arbol->nodo_raiz, funcion, extra, &corte);
   }else{
-    arbol_recorrido_postorden(arbol, (void**)array, cantidad);
-    while(corte == false && i < cantidad){
-      corte = funcion(array[i], extra);
-      i++;
-    }
+    cada_elemento_idn(arbol->nodo_raiz, funcion, extra, &corte);
   }
-  free(array);
 }
