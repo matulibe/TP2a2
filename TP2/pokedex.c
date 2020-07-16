@@ -7,22 +7,22 @@
 #include "abb.h"
 #include "pokedex.h"
 
-#define ABRIR "a+"
 #define LEER "r"
 #define ESCRIBIR "w"
 #define CAPTURADO 'S'
 #define NO_CAPTURADO 'N'
+#define ESPECIE 'E' 
+#define POKEMON 'P'
 
-#define FORMATO_E "%i;%[^;];%i;%[^;];%[^;]\n"
-#define FORMATO_A  "%i;%[^;];%[^;];%[^;];%i;%c\n"
-#define FORMATO_P_P_L "%c;%[^;];%i;%c\n"
-#define FORMATO_P_E_L "%c;%i;%[^;];%[^;]\n"
-#define FORMATO_P_P_E "%c;%s;%i;%c\n" //P;nombre_pokemon;nivel;capturado(S/N
-#define FORMATO_P_E_E "%c;%i;%s;%s\n" //E;numero_pokemon;nombre_especie; descripción_especie
+#define EVOLUCION "%i;%[^;];%i;%[^;];%[^;]\n"
+#define AVISTAMIENTOS "%i;%[^;];%[^;];%[^;];%i;%c\n"
+#define POKE_L "%c;%[^;];%i;%c\n"
+#define ESPECIE_L "%c;%i;%[^;];%[^;]\n"
+#define POKE_E "%c;%s;%i;%c\n" //P;nombre_pokemon;nivel;capturado(S/N
+#define ESPECIE_L "%c;%i;%s;%s\n" //E;numero_pokemon;nombre_especie; descripción_especie
 #define CANT_E 6
 #define CANT_A 6
-#define CANT_P_P 4
-#define CANT_P_E 4
+#define CANT_P 4
 
 #define POKEDEX "pokedex.txt"
 
@@ -102,7 +102,7 @@ int pokedex_avistar(pokedex_t* pokedex, char ruta_archivo[MAX_RUTA]){
   char capturado;
   int leidos = 0;
   while(leidos != EOF){//numero_pokemon;nombre_especie; descripción_especie;nombre_pokemon;nivel;capturado(S/N)
-    fscanf(archivo, FORMATO_A, &especie->numero, especie->nombre, especie->descripcion,poke->nombre, &poke->nivel, &capturado);
+    fscanf(archivo, AVISTAMIENTOS,&especie->numero, especie->nombre, especie->descripcion,poke->nombre, &poke->nivel, &capturado);
     especie_pokemon_t* buscador = (especie_pokemon_t*)(arbol_buscar(pokedex->pokemones, &especie->numero));
     if(!buscador){
       especie_pokemon_t* especie_aux = calloc(1, sizeof(especie_pokemon_t));
@@ -134,7 +134,7 @@ int pokedex_evolucionar(pokedex_t* pokedex, char ruta_archivo[MAX_RUTA]){
   especie_pokemon_t* evolucion = NULL;
   int leidos = 0;
   while(leidos != EOF){
-    fscanf(archivo, FORMATO_E, &numero_poke, poke_evol->nombre, &evolucion->numero, evolucion->nombre, evolucion->descripcion);
+    fscanf(archivo, EVOLUCION, &numero_poke, poke_evol->nombre, &evolucion->numero, evolucion->nombre, evolucion->descripcion);
     especie_pokemon_t* especie = (especie_pokemon_t*)(arbol_buscar(pokedex->pokemones, &evolucion->numero));
     if(!especie){
       especie = calloc(1, sizeof(especie_pokemon_t));
@@ -237,7 +237,7 @@ void guardar_especie(FILE * archivo, especie_pokemon_t* especie){//P;nombre_poke
   char letra_especie = 'E';
   char letra_pokemones = 'P';
   char capturado = 'N';
-  fprintf(archivo, FORMATO_P_E_E, letra_especie, especie->numero, especie->nombre, especie->descripcion);//E;numero_pokemon;nombre_especie; descripción_especie
+  fprintf(archivo, ESPECIE_L, letra_especie, especie->numero, especie->nombre, especie->descripcion);//E;numero_pokemon;nombre_especie; descripción_especie
   lista_iterador_t* iterador = lista_iterador_crear(especie->pokemones);
   particular_pokemon_t* aux = NULL;
   while(lista_iterador_tiene_siguiente(iterador)){
@@ -247,47 +247,98 @@ void guardar_especie(FILE * archivo, especie_pokemon_t* especie){//P;nombre_poke
     else
       capturado = 'N';
 
-    fprintf(archivo, FORMATO_P_P_E, letra_pokemones, aux->nombre, aux->nivel, capturado);
+    fprintf(archivo, POKE_E, letra_pokemones, aux->nombre, aux->nivel, capturado);
   }
 }
 
 
-void zag(FILE * archivo, nodo_abb_t* nodo); 
-
-
-void zig(FILE * archivo, nodo_abb_t* nodo){
-  if(!nodo)
-    return;
-  especie_pokemon_t* especie = (especie_pokemon_t*)nodo->elemento;
-  guardar_especie(archivo, especie);
-  zag(archivo, nodo->derecha);
-  zig(archivo, nodo->izquierda);
+bool contar_elementos(void* elemento, void* cantidad){
+  if(elemento)
+    (*(int*)cantidad)+=1;  
+  return false;
 }
 
-
-void zag(FILE * archivo, nodo_abb_t* nodo){
+void guardar_vector(nodo_abb_t* nodo, int posicion, especie_pokemon_t* especies){
   if(!nodo)
     return;
-  especie_pokemon_t* especie = (especie_pokemon_t*)nodo->elemento;
-  guardar_especie(archivo, especie);
-  zig(archivo, nodo->izquierda);
-  zag(archivo, nodo->derecha);
+  especies[posicion] = (*(especie_pokemon_t*)nodo->elemento);
+  guardar_vector(nodo->izquierda, posicion+1, especies);
+  guardar_vector(nodo->derecha, posicion+2, especies);
 }
 
+void escribir_archivo(FILE * archivo, especie_pokemon_t* especies, int cantidad){
+    if(!especies)
+      return;
+    int i = 0;
+    char especie = 'E';
+    char pokemon = 'P';
+    while(i < cantidad){
+      especie_pokemon_t* aux = &especies[i];
+      lista_iterador_t* pokemones = lista_iterador_crear(aux->pokemones);
+      if(!pokemones)
+        return;
+      fprintf(archivo, ESPECIE_L, especie, aux->numero, aux->nombre, aux->descripcion);
+      while(lista_iterador_tiene_siguiente(pokemones)){
+        particular_pokemon_t* poke = (particular_pokemon_t*)lista_iterador_siguiente(pokemones);
+        fprintf(archivo, POKE_E, pokemon, poke->nombre, poke->nivel, poke->capturado==true?CAPTURADO:NO_CAPTURADO);
+      }
+      i++;
+    }
+}
 
 int pokedex_apagar(pokedex_t* pokedex){
   if(!pokedex)
     return ERROR;
+  int cantidad = 0;
+  int posicion = 0;
+  abb_con_cada_elemento(pokedex->pokemones, ABB_RECORRER_PREORDEN, contar_elementos, &cantidad);
+  especie_pokemon_t* especies = malloc(sizeof(especie_pokemon_t)*(unsigned int)cantidad);
+  if(!especies)
+    return ERROR;
+  guardar_vector(pokedex->pokemones->nodo_raiz, posicion, especies);
   FILE * archivo = fopen(POKEDEX, ESCRIBIR);
-  if(!archivo)
+  if(!archivo){
+    free(especies);
     return  ERROR;
+  }
   fprintf(archivo, "%s\n", pokedex->nombre_entrenador);
-  zig(archivo, pokedex->pokemones->nodo_raiz);
+  escribir_archivo(archivo, especies, cantidad);
+  free(especies);
   fclose(archivo);
   return EXITO;
 }
 
+
+void iniciador(FILE * archivo, pokedex_t* pokedex){
+  char letra_especie = 'E';
+  char letra_poke = 'P';
+  int cant_leidos = 0;
+  while(cant_leidos != EOF){
+    especie_pokemon_t* especie = calloc(1,sizeof(especie_pokemon_t));
+    especie->pokemones = lista_crear();
+    cant_leidos = fscanf(archivo, ESPECIE_L, &letra_especie, &especie->numero, especie->nombre, especie->descripcion);
+    if(letra_especie != ESPECIE || cant_leidos != CANT_P)
+      return NULL;
+    especie->pokemones = lista_crear();
+    while(letra_poke =)
+  }
+
+}
+
+
 pokedex_t* pokedex_prender(){
   FILE * archivo = fopen(POKEDEX, LEER);
-  
+  if(!archivo)
+    return NULL;
+  char entrenador[MAX];
+  fscanf(archivo, "%s\n", entrenador);
+  pokedex_t* pokedex = pokedex_crear(entrenador);
+  if(!pokedex)
+    return NULL;
+  iniciador(archivo, pokedex);
+  return pokedex; 
 }
+
+
+
+
