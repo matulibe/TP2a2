@@ -10,7 +10,7 @@
 #define EXITO 0
 #define ERROR -1
 #define VACIO 0
-#define MAX 100000
+
 
 abb_t* arbol_crear(abb_comparador comparador, abb_liberar_elemento destructor){
   if(!comparador)
