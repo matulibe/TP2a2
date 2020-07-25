@@ -8,3 +8,20 @@ E;4;Charmander;La llama que tiene en la punta de la cola arde según sus sentimi
 P;Char;23;N
 P;Mander;5;S
 P;Agumon;13;N
+E;54;Psyduck;Siempre padece dolores de cabeza.
+P;Pato;23;S
+P;Ducky;2;N
+P;Psycky;45;S
+E;1;Bulbasaur;Este Pokémon nace con una semilla en el lomo.
+P;Planta;12;N
+P;Bulb;3;S
+E;7;Squirtle;Escupe chorros de agua por la boca.
+P;Vamo;23;S
+P;A;2;S
+P;Calmarno;45;S
+E;50;Diglet;Este Pokémon avanza horadando la tierra a poca profundidad.
+P;Topo;1;N
+P;Gusano;5;S
+E;66;Machop;Siempre rebosante de energía, extremadamente fuerte.
+P;Debilucho;78;S
+P;Macho;33;N

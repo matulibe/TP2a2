@@ -6,3 +6,12 @@
 35;Clefairy;Clefairy es muy rosa...;Cleffinha;13;S
 25;Pikachu;Pikachu es un raton...;Pikante;39;S
 8;Wartortle;Wartortle es la tortuga...;Trotu;10;N
+67;Machoke;Necesita un cinto antifuerza...;Moke;99;S
+67;Machoke;Necesita un cinto antifuerza...;Choke;67;S
+133;Eevee;Tiene una gran variedad de evoluciones;Comodin;10;S
+16;Pidgey;Es un pajaro;Pico;4;N
+23;Ekans;Con el tiempo su longitud aumenta;Nagini;34;S
+21;Spearow;Es medio gallina...creo;Chicken;12;S
+86;Seel;Le gusta nadar y el frio;Leon;9;S
+58;Growlithe;De naturaleza valiente y honrada;Cobarde;23;S
+133;Eevee;Tiene una gran variedad de evoluciones;Siniestro;99;S
