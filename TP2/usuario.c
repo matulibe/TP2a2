@@ -108,19 +108,11 @@ void evolucionar(pokedex_t** pokedex){
 
 
 void recien_capturados(pokedex_t** pokedex){
-  if(lista_vacia((*pokedex)->ultimos_capturados)){
-    printf("No se capturaron pokemones recientemente\n");
-    return;
-  }
   pokedex_ultimos_capturados(*pokedex);
 }
 
 
 void recien_avistados(pokedex_t** pokedex){
-  if(lista_vacia((*pokedex)->ultimos_vistos)){
-    printf("No se avistaron pokemones recientemente\n");
-    return;
-  }
   pokedex_ultimos_vistos(*pokedex);
 }
 
