@@ -39,6 +39,12 @@
 #define IGUAL 0
 
 
+/*
+ *Pre: Recibira dos especies.
+ * 
+ * Post: Si la primera es mayor de vuelve 1, si es menor -1 y si son
+ * iguales devuelve 0.
+ */
 int comparador(void* entrante, void* nodo_actual){
 	if(!entrante || !nodo_actual)
 		return 0;
@@ -54,11 +60,13 @@ int comparador(void* entrante, void* nodo_actual){
 	return IGUAL;
 }
 
+//Libera a los pokemones de la lista.
 void destruir_pokemones(void* pokemon, void* extra){
   extra=extra;
   free((particular_pokemon_t*)pokemon);
 }
 
+//Libera la especie y sus pokemones.
 void liberar_especie(especie_pokemon_t* especie){
   if(especie){
     lista_con_cada_elemento(especie->pokemones, destruir_pokemones, NULL);
@@ -67,6 +75,7 @@ void liberar_especie(especie_pokemon_t* especie){
   }
 }
 
+//Libera la especie y sus pokemones.
 void destructor(void* especie){
   if(!especie)
     return;
@@ -74,7 +83,7 @@ void destructor(void* especie){
   
 }
 
-
+//Reserva memoria para una especie y su lista. Devuelve la especie.
 especie_pokemon_t* crear_especie(){
   especie_pokemon_t* aux = calloc(1, sizeof(especie_pokemon_t));
   if(!aux)
@@ -87,6 +96,8 @@ especie_pokemon_t* crear_especie(){
   return aux;
 }
 
+
+//Reserva memoria para un pokemon. Devuelve el pokemon
 particular_pokemon_t* crear_pokemon(){
   particular_pokemon_t* aux = calloc(1, sizeof(particular_pokemon_t));
   if(!aux)
@@ -125,7 +136,7 @@ pokedex_t* pokedex_crear(char entrenador[MAX_NOMBRE]){
   return aux;
 }
 
-
+//Destruira las especies ya inseratadas en el arbol las cuales hay que sacar y el pokemon recicido.
 void destruir_extras(especie_pokemon_t* especie, particular_pokemon_t* poke){
   if(poke)
     free(poke);
@@ -134,7 +145,12 @@ void destruir_extras(especie_pokemon_t* especie, particular_pokemon_t* poke){
 }
 
 
-
+/*
+ *Pre: Recibira un archivo, una pokedex, una especie, un pokemon y una cantidad de leidos.
+ * 
+ *Post: Leerá a los pokemones y los insertara en la lista que deba. Si la especie no existe la crea
+ *e insertara al pokemon en la lista. 
+ */
 void asignar_pokemones(FILE * archivo, pokedex_t* pokedex, especie_pokemon_t* especie, particular_pokemon_t* poke, int* leidos){
   especie_pokemon_t* buscador = NULL;
   char capturado;
@@ -188,7 +204,12 @@ void destruir_insertado_recientemente(pokedex_t* pokedex, especie_pokemon_t* esp
   arbol_borrar(pokedex->pokemones, especie);
 }
 
-
+/*
+ *Pre: Recibira la pokedex, una especie viejan una evolucionada, un pokemon y un bool.
+ *
+ *Post: Cambaira de lista al pokemon recibido y devolvera 0. En el caso de que no exista o no este capturado liberara la memoria que necesite
+ *y devolvera -1  
+ */
 int cambiar_evolucionado(pokedex_t* pokedex, especie_pokemon_t* buscador, especie_pokemon_t* especie, particular_pokemon_t* poke_evol, bool reciente){
   int pos = 0, retorno = EXITO;
   bool encontrado = false;
@@ -203,11 +224,9 @@ int cambiar_evolucionado(pokedex_t* pokedex, especie_pokemon_t* buscador, especi
   }
   lista_iterador_destruir(iterador);
   if(encontrado && aux->capturado == true){
-    poke_evol->nivel = aux->nivel;
-    poke_evol->capturado = true;
-    free(aux);
+    free(poke_evol);
     lista_borrar_de_posicion(buscador->pokemones, (size_t)(pos));
-    lista_insertar(especie->pokemones, poke_evol);
+    lista_insertar(especie->pokemones, aux);
   }else{
     if(reciente == true)
       destruir_insertado_recientemente(pokedex, especie, poke_evol);
@@ -218,7 +237,12 @@ int cambiar_evolucionado(pokedex_t* pokedex, especie_pokemon_t* buscador, especi
   return retorno;
 }
 
-
+/*
+ *Pre: Recibira un archivo, una pokedex, una especie, un pokemon, un entero de retorno y un entero de leidos
+ *
+ *Post: Leera la informacion de los pokemones. Creara la especie nueva si es necesario y cambiara de lista a los pokemones 
+ *y liberara la memeoria que ya no sirva. Devuelve 0 o -1.
+ */
 int reordenar_pokedex(FILE * archivo, pokedex_t* pokedex, especie_pokemon_t* evolucion, particular_pokemon_t* poke_evol, int* retorno, int* leidos){
   int numero_poke, aux;
   bool reciente = false; //Para chequear si la especie se creo recientemente o no.
@@ -320,16 +344,34 @@ void pokedex_ultimos_vistos(pokedex_t* pokedex){
   }
 }
 
+
+/*
+ *Pre: Recibira un pokemon.
+ * 
+ * Post: Imprimira la informacion del pokemon.
+ */
 void listar_pokemones(void* pokemon, void* extra){
   particular_pokemon_t* poke = (particular_pokemon_t*)pokemon;
   printf("\tNombre:%s \tNivel:%i \tEstado:%s\n", poke->nombre, poke->nivel, poke->capturado==true?ESTADO_1:ESTADO_2);
 }
 
+
+/*
+ *Pre: Recibira una especie.
+ * 
+ *Post: Imprimira la informacion de la especie y de sus pokemones.
+ */
 void listar_especie(especie_pokemon_t* especie){
   printf("Especie: %s\n Descripcion: %s\n", especie->nombre, especie->descripcion);
   lista_con_cada_elemento(especie->pokemones, listar_pokemones, NULL);
 }
 
+
+/*
+ *Pre: Recibira un pokemon y su especie.
+ * 
+ * Post: Imprimira la informacion del pokemon y su especie.
+ */
 
 void imprimir_informacion(especie_pokemon_t* especie, particular_pokemon_t* pokemon){
   printf("Pokemon: %s\n", pokemon->nombre);
@@ -340,7 +382,16 @@ void imprimir_informacion(especie_pokemon_t* especie, particular_pokemon_t* poke
 }
 
 
+
+/*
+ *Pre: Recibira una especicie, un nombre y un pokemon vacio.
+ *
+ * Post: Bucara al pokemon en la lista, si lo encuentra devolvera true y el pokemon 
+ * auxiliar apuntara al pokemon buscaso. Si no existe devolvera fasle.
+ */
 bool buscar_poke(especie_pokemon_t* especie, char nombre_pokemon[], particular_pokemon_t* pokemon){
+  if(!especie)
+    return false;
   lista_iterador_t* iterador = lista_iterador_crear(especie->pokemones);
   bool encontro = false;
   while(lista_iterador_tiene_siguiente(iterador) && !encontro){
@@ -348,9 +399,14 @@ bool buscar_poke(especie_pokemon_t* especie, char nombre_pokemon[], particular_p
     if(strcmp(nombre_pokemon, pokemon->nombre)==IGUAL)
       encontro = true;
   }
+  if(encontro)
+    imprimir_informacion(especie, pokemon);
   lista_iterador_destruir(iterador);
   return encontro;
 }
+
+
+
 
 void pokedex_informacion(pokedex_t* pokedex, int numero_pokemon, char nombre_pokemon[MAX_NOMBRE]){
   if(!pokedex || !numero_pokemon)
@@ -360,22 +416,23 @@ void pokedex_informacion(pokedex_t* pokedex, int numero_pokemon, char nombre_pok
   especie_pokemon_t* especie = (especie_pokemon_t*)arbol_buscar(pokedex->pokemones, aux);
   if(!especie){
     printf("No se podido encontrar la especie pokemon\n");
+    destruir_extras(aux, NULL);
     return;
   }
-  if(!nombre_pokemon ){
+  if(!nombre_pokemon){
     listar_especie(especie);
-    free(aux);
+    destruir_extras(aux, NULL);
     return;
   }
   particular_pokemon_t* pokemon = NULL;
   bool encontro = buscar_poke(especie, nombre_pokemon, pokemon);
   if(!encontro){
     printf("El pokemon buscado no pudo ser localizado\n");
+    destruir_extras(aux, NULL);
     return;
   }
-  imprimir_informacion(especie, pokemon);
   printf("\n");
-  free(aux);
+  destruir_extras(aux, NULL);
 }
 
 
@@ -393,13 +450,25 @@ void pokedex_destruir(pokedex_t* pokedex){
 
 
 
-
+/*
+ *Pre: Recibira un pokemon y un archivo.
+ *
+ * Post: Escribira la informacion del pokemon en el archivo para guardar sus datos en la 
+ * pokedex.
+ */
 void escribir_pokemones(void* pokemon, void* extra){
   FILE * archivo = (FILE *)extra;
   particular_pokemon_t* poke = (particular_pokemon_t*)pokemon;
   fprintf(archivo, POKE_E, POKEMON, poke->nombre, poke->nivel, poke->capturado==true?CAPTURADO:NO_CAPTURADO);
 }
 
+
+/*
+ *Pre: Recibira una especie y un archivo.
+ *
+ * Post: Guardara la informacion de la especie y sus pokemones y las escribira en el 
+ * archivo para guardarlas. Lo hara ordenadamente para que no se pierda el orden del arbol.
+ */
 bool escribir_especies(void* pokemon, void* extra){
   FILE * archivo = (FILE *)extra;
   especie_pokemon_t* especie = (especie_pokemon_t*)pokemon;
@@ -423,8 +492,12 @@ int pokedex_apagar(pokedex_t* pokedex){
 }
 
 
-
-
+/*
+ * Pre: Recibira el archivo y la pokedex ya inicializada
+ * 
+ * Post: Leerá el archivo e ira reservando memoria para las especies y las insertara en el arbol de la 
+ * pokedex. Y tambien leerá los pokemones y los insertara en la lista de su especie.
+ */
 void iniciador(FILE * archivo, pokedex_t* pokedex){
   char letra, capturado; 
   int cant_leidos = 0;

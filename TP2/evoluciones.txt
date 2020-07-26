@@ -8,3 +8,6 @@
 21;Chicken;22;Fearow;Al menor atisbo de peligro, alza el vuelo y huye.
 23;Nagini;24;Arbok;Es un tanto espeluznante...
 133;Siniestro;197;Umbreon;En noches de luna llena sus anillos brillan.
+50;Gusano;51;Dugtrio;Son 3 diglets!
+75;Roca;76;Golem;Ahora la piedra tiene patas.
+130;Karp;131;Gyrardos;Es exageradamente agresivo y lanza hiperrayos.

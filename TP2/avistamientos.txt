@@ -15,3 +15,6 @@
 86;Seel;Le gusta nadar y el frio;Leon;9;S
 58;Growlithe;De naturaleza valiente y honrada;Cobarde;23;S
 133;Eevee;Tiene una gran variedad de evoluciones;Siniestro;99;S
+74;Geodude;Es una piedra;Adoquin;5;N
+75;Graveler;Se le suele ver rodando montaña abajo.;Roca;34;S
+129;Magikarp;Mejor no hablar de el...;Karp;65;S
